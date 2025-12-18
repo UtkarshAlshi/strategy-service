@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID; // <-- ADD
+import org.springframework.web.bind.annotation.PathVariable; // <-- ADD
 
 @RestController
 @RequestMapping("/api/strategies")
@@ -42,5 +44,17 @@ public class StrategyController {
             @RequestHeader("X-User-Email") String userEmail) {
         List<StrategyResponse> strategies = strategyService.getStrategiesByUser(userEmail);
         return ResponseEntity.ok(strategies);
+    }
+
+    // --- ADD THIS NEW ENDPOINT ---
+    @GetMapping("/{id}/internal")
+    public ResponseEntity<Strategy> getStrategyForBacktest(
+            @PathVariable UUID id,
+            @RequestHeader("X-User-Email") String userEmail) {
+        
+        // Note: We are returning the FULL entity here, not a DTO.
+        // This is generally OK for a trusted, internal service call.
+        Strategy strategy = strategyService.getStrategyById(id, userEmail);
+        return ResponseEntity.ok(strategy);
     }
 }
